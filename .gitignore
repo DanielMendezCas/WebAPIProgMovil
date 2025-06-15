@@ -1,0 +1,38 @@
+# Archivos de compilación y salida
+*.dll
+*.exe
+*.pdb
+**/bin/
+**/obj/
+
+# Configuración de usuario
+*.user
+*.suo
+.vscode/
+.vs/
+launchSettings.json
+
+# Archivos temporales y de caché
+*.tmp
+*.log
+npm-debug.log
+.DS_Store
+Thumbs.db
+
+# Paquetes de NuGet
+.nupkg
+packages/
+project.lock.json
+
+# Archivos de publicación
+publish/
+out/
+
+# Configuración local
+secrets.json
+appsettings.Development.json
+appsettings.Local.json
+
+# Ignorar todos los archivos de configuración excepto el appsettings.json principal
+appsettings..json
+!appsettings.json
