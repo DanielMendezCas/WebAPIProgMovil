@@ -55,7 +55,7 @@ namespace WebAPIProgMovil.Repositorios
             }
         }
 
-        public async Task ActializarPin(Pin pin)
+        public async Task ActualizarPin(Pin pin)
         {
             using (var conexion = new SqlConnection(connectionString))
             {

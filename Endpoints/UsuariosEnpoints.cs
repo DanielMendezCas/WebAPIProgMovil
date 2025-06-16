@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -14,6 +15,7 @@ namespace WebAPIProgMovil.Endpoints
         public static RouteGroupBuilder MapUsuarios(this RouteGroupBuilder group)
         {
             group.MapPost("/registrar", Registrar);
+            group.MapPost("/inicioSesion", InicioSesion);
             return group;
         }
 
@@ -37,6 +39,38 @@ namespace WebAPIProgMovil.Endpoints
             else
             {
                 return TypedResults.BadRequest(resultado.Errors);
+            }
+        }
+
+        static async Task<Results<Ok<RespuestaAutenticacionDTO>, BadRequest<string>>> InicioSesion
+           (
+               CredencialesLoginDTO credencialesUsuarioDTO,
+               [FromServices] SignInManager<IdentityUser> signInManager,
+               [FromServices] UserManager<IdentityUser> userManager,
+               IConfiguration configuration
+           )
+        {
+            var usuario = await userManager.FindByEmailAsync(credencialesUsuarioDTO.Email);
+            if (usuario is null)
+            {
+                return TypedResults.BadRequest("Credenciales Incorrectas");
+            }
+            var resultado = await signInManager.CheckPasswordSignInAsync(usuario,
+                credencialesUsuarioDTO.Password, lockoutOnFailure: false);
+            if (resultado.Succeeded)
+            {
+                var tokenDTO = new CredencialesUsuarioDTO
+                {
+                    Email = usuario.Email!,
+                    UserName = usuario.UserName!,
+                    Password = "" 
+                };
+                var respuestaAutenticacion = ConstruirToken(tokenDTO, configuration);
+                return TypedResults.Ok(respuestaAutenticacion);
+            }
+            else
+            {
+                return TypedResults.BadRequest("Credenciales Incorrectas");
             }
         }
 

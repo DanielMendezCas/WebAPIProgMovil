@@ -14,10 +14,15 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IRepositorioUsuarios, RepositorioUsuarios>();
 builder.Services.AddScoped<IRepositorioPines, RepositorioPines>();
 builder.Services.AddScoped<IAlmacenadorArchivos, AlmacenadorArchivos>();
+builder.Services.AddTransient<IServicioUsuarios,  ServicioUsuarios>();
 
 builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddAuthentication().AddJwtBearer(opciones =>
+{
+    opciones.MapInboundClaims = false;
+
     opciones.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = false,
@@ -27,10 +32,13 @@ builder.Services.AddAuthentication().AddJwtBearer(opciones =>
         //IssuerSigningKey = Llaves.ObtenerLlave(builder.Configuration).First(),
         IssuerSigningKeys = Llaves.ObtenerTodasLasLlaves(builder.Configuration),
         ClockSkew = TimeSpan.Zero
-    });
+    };
+});
+
 builder.Services.AddAuthorization();
 
 builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddTransient<IUserStore<IdentityUser>, UsuarioStore>();
 builder.Services.AddIdentityCore<IdentityUser>();
 builder.Services.AddTransient<SignInManager<IdentityUser>>(); //Logear usuarios
@@ -46,6 +54,7 @@ if (builder.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapGroup("/pines").MapPines();
 app.MapGroup("/usuarios").MapUsuarios();
